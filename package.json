@@ -1,5 +1,5 @@
 {
-  "name": "dream-cheeky-driver",
+  "name": "dream-cheeky-driver-api",
   "version": "3.0.0",
   "description": "Driver for Dream Cheeky Missile Launcher",
   "main": "main.js",
