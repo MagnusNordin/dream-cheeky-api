@@ -1,7 +1,8 @@
 const launcher = require('./launcherUSB');
 const DEVICE_CONSTANTS = require('./deviceConstants')
 
- const signal = function(cmd, durationMS, callback) {
+ const signal = async function(cmd, durationMS) {
+  return new Promise((resolve) => {
     launcher.controlTransfer(0x21, 0x09, 0x0, 0x0, Buffer.from([0x02, cmd, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]),
         function (data) {
           var movementCommand = [
@@ -13,20 +14,22 @@ const DEVICE_CONSTANTS = require('./deviceConstants')
 
           if (!Number.isInteger(durationMS)) return;
           if (durationMS <= 0) {
-            if (typeof callback === 'function') callback();
+            resolve();
             return;
           }
 
           if (!movementCommand.includes(cmd)) {
-            setTimeout(callback, durationMS);
+            setTimeout(resolve, durationMS);
             return;
           }
 
           setTimeout( function() {
-            if(typeof callback === 'function') callback();
+            resolve();
             signal(DEVICE_CONSTANTS.CMD.STOP);
           }, durationMS);
         }
     );
+  })
+
   }
   module.exports = signal;

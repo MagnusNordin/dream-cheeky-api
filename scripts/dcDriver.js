@@ -1,8 +1,7 @@
 const usb = require('usb');
 const signal = require('./signal');
-const trigger = require('./trigger');
-const DEVICE_CONSTANTS = require('./deviceConstants')
-const shortHandTranslationMap =  require('./shortHandTranslationMap');
+const DEVICE_CONSTANTS = require('./deviceConstants');
+const launcher = require('./launcherUSB');
 
 const DCDriver = {
   DEVICE_CONSTANTS: DEVICE_CONSTANTS,
@@ -12,62 +11,46 @@ const DCDriver = {
   turnOffDebugMode: function(){
     usb.setDebugLevel(0);
   },
-  moveUp: function (durationMS, callback) {
-    signal(DEVICE_CONSTANTS.CMD.UP, durationMS, callback);
+  moveUp: async function (durationMS) {
+    return signal(DEVICE_CONSTANTS.CMD.UP, durationMS);
   },
-  moveDown: function (durationMS, callback) {
-    signal(DEVICE_CONSTANTS.CMD.DOWN, durationMS, callback);
+  moveDown: async function (durationMS) {
+    return signal(DEVICE_CONSTANTS.CMD.DOWN, durationMS);
   },
-  moveLeft: function (durationMS, callback) {
-    signal(DEVICE_CONSTANTS.CMD.LEFT, durationMS, callback);
+  moveLeft: async function (durationMS) {
+    return signal(DEVICE_CONSTANTS.CMD.LEFT, durationMS);
   },
-  moveRight: function (durationMS, callback) {
-    signal(DEVICE_CONSTANTS.CMD.RIGHT, durationMS, callback);
+  moveRight: async function (durationMS) {
+    return signal(DEVICE_CONSTANTS.CMD.RIGHT, durationMS);
   },
-  stop: function (callback) {
-    if (typeof callback === 'function' && callback !== DCDriver.stop) {
-      signal(DEVICE_CONSTANTS.CMD.STOP, 0, callback);
-    } else {
-      signal(DEVICE_CONSTANTS.CMD.STOP);
-    }
+  stop: async function () {
+      return signal(DEVICE_CONSTANTS.CMD.STOP, 1000);
   },
-  fire: function (number, callback) {
+  release: async function () {
+    return new Promise((resolve) => {
+      const launcherInterface = launcher.interface(0);
+      launcherInterface.release(true, () => {
+        resolve();
+      });
+    });
+  },
+  fire: async function (number) {
     number = Number.isInteger(number) && number >= 0 && number <= DEVICE_CONSTANTS.MISSILES.NUMBER ? number : 1;
     if (number === 0) {
-      DCDriver.stop(callback);
+      return DCDriver.stop();
     } else {
-      signal(DEVICE_CONSTANTS.CMD.FIRE, DEVICE_CONSTANTS.MISSILES.RELOAD_DELAY_MS, trigger(DCDriver.fire, number - 1, callback));
-    }
-  },
-  park: function (callback) {
-    DCDriver.execute('l8000,d2000', callback);
-  },
-  execute: function (commands, callback) {
-    if (typeof commands === 'string') {
-      DCDriver.execute(commands.split(','), callback);
-    } else if (commands.length === 0) {
-      DCDriver.stop(callback);
-    } else {
-      var command = commands.shift();
-      var func = command.length > 0 ? DCDriver[shortHandTranslationMap[command[0]]] : null;
-      if (typeof func === 'function') {
-        var next = trigger(DCDriver.execute, commands, callback);
-        if (func === DCDriver.park || func === DCDriver.stop) {
-          func(next);
-        } else {
-          var number;
-          try {
-            number = parseInt(command.substring(1), 10);
-          } catch (ignore) {
-            number = null;
-          }
-          func(number, next);
+      while (number !== 0) {
+        if (number === 0) {
+          return signal(DEVICE_CONSTANTS.CMD.FIRE, DEVICE_CONSTANTS.MISSILES.RELOAD_DELAY_MS);
         }
-      } else {
-        console.warn('Ignoring bad command: ' + command);
-        DCDriver.execute(commands, callback);
+        await signal(DEVICE_CONSTANTS.CMD.FIRE, DEVICE_CONSTANTS.MISSILES.RELOAD_DELAY_MS);
+        number --;
       }
     }
-  }
+  },
+  park: async function () {
+    await DCDriver.moveLeft(8000)
+    return DCDriver.moveDown(2000);
+  },
 };
 module.exports = DCDriver

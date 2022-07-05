@@ -35,7 +35,7 @@ Turn on debug mode (level 4) of USB.
 
 Turn off USB debug mode (ie. debug level 0).
 
-####DCDriver.moveUp(`durationMS`[, `callback`])
+####DCDriver.moveUp(`durationMS`)
 **Description:**
 
 Move up for a period of time.
@@ -45,13 +45,7 @@ Move up for a period of time.
 #####`durationMS`
 Type: Number
 
-Duration of moving time in ms.
-#####`callback`
-Type: Function()
-
-A function to execute when the movement is done.
-
-####DCDriver.moveDown(`durationMS`[, `callback`])
+####DCDriver.moveDown(`durationMS`)
 **Description:**
 
 Move down for a period of time.
@@ -61,13 +55,7 @@ Move down for a period of time.
 #####`durationMS`
 Type: Number
 
-Duration of moving time in ms.
-#####`callback`
-Type: Function()
-
-A function to execute when the movement is done.
-
-####DCDriver.moveLeft(`durationMS`[, `callback`])
+####DCDriver.moveLeft(`durationMS`)
 **Description:**
 
 Move left for a period of time.
@@ -77,13 +65,7 @@ Move left for a period of time.
 #####`durationMS`
 Type: Number
 
-Duration of moving time in ms.
-#####`callback`
-Type: Function()
-
-A function to execute when the movement is done.
-
-####DCDriver.moveRight(`durationMS`[, `callback`])
+####DCDriver.moveRight(`durationMS`)
 **Description:**
 
 Move right for a period of time.
@@ -93,23 +75,13 @@ Move right for a period of time.
 #####`durationMS`
 Type: Number
 
-Duration of moving time in ms.
-#####`callback`
-Type: Function()
-
-A function to execute when the movement is done.
-
-####DCDriver.stop([`callback`])
+####DCDriver.stop()
 
 Stop movement immediately.
 
 **Parameters:**
 
-#####`callback`
-Type: Function()
-
-A function to execute when the movement is stopped.
-####DCDriver.fire(`numberOfShot`[, `callback`])
+####DCDriver.fire(`numberOfShot`)
 
 Shoot for `numberOfShot` times consecutively.
 
@@ -119,35 +91,12 @@ Shoot for `numberOfShot` times consecutively.
 Type: Number
 
 Number of shots
-#####`callback`
-Type: Function()
-
-A function to execute when all the shooting is done (and when the target is utterly destroyed!).
 
 
-####DCDriver.park([`callback`])
+####DCDriver.park()
 
 Go back to a fixed default location (leftmost and bottommost position).
 
 **Parameters:**
 
-#####`callback`
-Type: Function()
 
-A function to execute when all the movement is done.
-
-####DCDriver.execute(`commands`[, `callback`])
-
-**NOT STABLE** yet, will be improved.
-
-Convenient method to specify a chain of commands
-
-**Parameters:**
-
-#####`commands`
-Type: String
-
-#####`callback`
-Type: Function()
-
-A function to execute when the chain of commands is done.
