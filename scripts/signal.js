@@ -1,6 +1,8 @@
-define(['underscore', 'launcherUSB', 'deviceConstants'], function(__, launcher, DEVICE_CONSTANTS){
-  return function signal(cmd, durationMS, callback) {
-    launcher.controlTransfer(0x21, 0x09, 0x0, 0x0, new Buffer([0x02, cmd, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]),
+const launcher = require('./launcherUSB');
+const DEVICE_CONSTANTS = require('./deviceConstants')
+
+ const signal = function(cmd, durationMS, callback) {
+    launcher.controlTransfer(0x21, 0x09, 0x0, 0x0, Buffer.from([0x02, cmd, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]),
         function (data) {
           var movementCommand = [
             DEVICE_CONSTANTS.CMD.UP,
@@ -9,22 +11,22 @@ define(['underscore', 'launcherUSB', 'deviceConstants'], function(__, launcher, 
             DEVICE_CONSTANTS.CMD.RIGHT
           ];
 
-          if (!__.isNumber(durationMS)) return;
+          if (!Number.isInteger(durationMS)) return;
           if (durationMS <= 0) {
-            if (__.isFunction(callback)) callback();
+            if (typeof callback === 'function') callback();
             return;
           }
 
-          if (!__.contains(movementCommand, cmd)) {
-            __.delay(callback, durationMS);
+          if (!movementCommand.includes(cmd)) {
+            setTimeout(callback, durationMS);
             return;
           }
 
-          __.delay(function(){
-            if(__.isFunction(callback)) callback();
+          setTimeout( function() {
+            if(typeof callback === 'function') callback();
             signal(DEVICE_CONSTANTS.CMD.STOP);
           }, durationMS);
         }
     );
   }
-});
+  module.exports = signal;

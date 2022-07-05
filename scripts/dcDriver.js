@@ -1,64 +1,56 @@
-define(['usb', 'signal', 'trigger', 'deviceConstants', 'shortHandTranslationMap', 'underscore'], function(usb, signal, trigger, DEVICE_CONSTANTS, shortHandTranslationMap, __){
+const usb = require('usb');
+const signal = require('./signal');
+const trigger = require('./trigger');
+const DEVICE_CONSTANTS = require('./deviceConstants')
+const shortHandTranslationMap =  require('./shortHandTranslationMap');
 
-  var DCDriver = {};
-
-  DCDriver.DEVICE_CONSTANTS = DEVICE_CONSTANTS;
-
-  DCDriver.turnOnDebugMode = function(){ 
+const DCDriver = {
+  DEVICE_CONSTANTS: DEVICE_CONSTANTS,
+  turnOnDebugMode: function(){ 
     usb.setDebugLevel(4);
-  };
-
-  DCDriver.turnOffDebugMode = function(){
+  },
+  turnOffDebugMode: function(){
     usb.setDebugLevel(0);
-  }
-
-
-  DCDriver.moveUp = function (durationMS, callback) {
+  },
+  moveUp: function (durationMS, callback) {
     signal(DEVICE_CONSTANTS.CMD.UP, durationMS, callback);
-  };
-
-  DCDriver.moveDown = function (durationMS, callback) {
+  },
+  moveDown: function (durationMS, callback) {
     signal(DEVICE_CONSTANTS.CMD.DOWN, durationMS, callback);
-  };
-
-  DCDriver.moveLeft = function (durationMS, callback) {
+  },
+  moveLeft: function (durationMS, callback) {
     signal(DEVICE_CONSTANTS.CMD.LEFT, durationMS, callback);
-  };
-
-  DCDriver.moveRight = function (durationMS, callback) {
+  },
+  moveRight: function (durationMS, callback) {
     signal(DEVICE_CONSTANTS.CMD.RIGHT, durationMS, callback);
-  };
-
-  DCDriver.stop = function (callback) {
-    if (__.isFunction(callback) && callback !== DCDriver.stop) {
+  },
+  stop: function (callback) {
+    if (typeof callback === 'function' && callback !== DCDriver.stop) {
       signal(DEVICE_CONSTANTS.CMD.STOP, 0, callback);
     } else {
       signal(DEVICE_CONSTANTS.CMD.STOP);
     }
-  };
-
-  DCDriver.fire = function (number, callback) {
-    number = __.isNumber(number) && number >= 0 && number <= DEVICE_CONSTANTS.MISSILES.NUMBER ? number : 1;
+  },
+  fire: function (number, callback) {
+    number = Number.isInteger(number) && number >= 0 && number <= DEVICE_CONSTANTS.MISSILES.NUMBER ? number : 1;
     if (number === 0) {
       DCDriver.stop(callback);
     } else {
       signal(DEVICE_CONSTANTS.CMD.FIRE, DEVICE_CONSTANTS.MISSILES.RELOAD_DELAY_MS, trigger(DCDriver.fire, number - 1, callback));
     }
-  };
-
-  DCDriver.park = function (callback) {
+  },
+  park: function (callback) {
     DCDriver.execute('l8000,d2000', callback);
-  };
-
-  DCDriver.execute = function (commands, callback) {
-    if (__.isString(commands)) {
+  },
+  execute: function (commands, callback) {
+    if (typeof commands === 'string') {
       DCDriver.execute(commands.split(','), callback);
     } else if (commands.length === 0) {
       DCDriver.stop(callback);
     } else {
       var command = commands.shift();
       var func = command.length > 0 ? DCDriver[shortHandTranslationMap[command[0]]] : null;
-      if (__.isFunction(func)) {
+      if (typeof func === 'function') {
         var next = trigger(DCDriver.execute, commands, callback);
         if (func === DCDriver.park || func === DCDriver.stop) {
           func(next);
@@ -77,6 +69,5 @@ define(['usb', 'signal', 'trigger', 'deviceConstants', 'shortHandTranslationMap'
       }
     }
   }
-
-  return DCDriver;
-});
+};
+module.exports = DCDriver

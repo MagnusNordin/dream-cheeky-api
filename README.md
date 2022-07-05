@@ -2,9 +2,12 @@ dream-cheeky-api
 ================
 
 Nodejs API for controller dream cheeky missile launcher.
-This is a reinforcement of [pathikrit's *node-thunder-driver* library](https://github.com/pathikrit/node-thunder-driver), with some unexpected behaviours removed and extra features.
+This is a reinforcement of [pathikrit's *node-thunder-driver* library](https://github.com/pathikrit/node-thunder-driver), with some unexpected behaviours removed and extra features. Now supports Node v16.
 
 ____________________
+Prerequisite
+==============
+For module usb and linux: `sudo apt-get install build-essential libudev-dev`
 
 Installation
 ==============

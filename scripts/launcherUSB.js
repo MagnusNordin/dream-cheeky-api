@@ -1,6 +1,7 @@
-define(['usb', 'deviceConstants'], function(usb, DEVICE_CONSTANTS) {
+const usb = require('usb');
+const DEVICE_CONSTANTS = require('./deviceConstants')
 	
-	var launcher = usb.findByIds(DEVICE_CONSTANTS.ID.VENDOR, DEVICE_CONSTANTS.ID.PRODUCT);
+	const launcher = usb.findByIds(DEVICE_CONSTANTS.ID.VENDOR, DEVICE_CONSTANTS.ID.PRODUCT);
 
 	if (!launcher) {
 	  throw 'Launcher not found - make sure your Thunder Missile Launcher is plugged in to a USB port';
@@ -8,7 +9,7 @@ define(['usb', 'deviceConstants'], function(usb, DEVICE_CONSTANTS) {
 
 	launcher.open();
 
-	var launcherInterface = launcher.interface(0);
+	const launcherInterface = launcher.interface(0);
 	if (launcherInterface.isKernelDriverActive()) {
 	  launcherInterface.detachKernelDriver();
 	}
@@ -22,6 +23,4 @@ define(['usb', 'deviceConstants'], function(usb, DEVICE_CONSTANTS) {
 	  // console.log("Close usb");
 	});
 
-	return launcher;
-
-});
+	module.exports = launcher;
